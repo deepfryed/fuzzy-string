@@ -15,8 +15,10 @@
 #include <ruby/encoding.h>
 #include "version.h"
 
-#define max(a, b)  (a > b ? a : b)
-#define min(a, b)  (a < b ? a : b)
+#define max(a, b)     (a > b ? a : b)
+#define min(a, b)     (a < b ? a : b)
+#define min3(a, b, c) (a < b ? (a < c ? a : c) : (b < c ? b : c))
+
 #define TO_S(v)    rb_funcall(v, rb_intern("to_s"), 0)
 #define CSTRING(v) RSTRING_PTR(TO_S(v))
 
@@ -106,8 +108,45 @@ double c_jaro_winkler_distance(char *s1, char *s2) {
     return jw;
 }
 
+int c_levenstein_distance(char *s, char *t) {
+    int k, i, j, n, m, cost, *d, distance;
+    n = strlen(s);
+    m = strlen(t);
+    if (n != 0 && m != 0) {
+        d = (int*)malloc((sizeof(int)) * (m + 1) * (n + 1));
+        m++;
+        n++;
+        //Step 2
+        for (k = 0; k < n; k++)
+            d[k] = k;
+        for (k = 0; k < m; k++)
+            d[k * n] = k;
+        //Step 3 and 4
+        for (i = 1; i < n; i++)
+            for (j = 1; j < m; j++) {
+                //Step 5
+                if (s[i - 1] == t[j - 1])
+                    cost = 0;
+                else
+                    cost = 1;
+                //Step 6
+                d[j * n + i] = min3(d[(j - 1) * n + i] + 1, d[j * n + i - 1] + 1, d[(j - 1) * n + i - 1] + cost);
+            }
+        distance = d[n * m - 1];
+        free(d);
+        return distance;
+    }
+    //a negative return value means that one or both strings are empty.
+    else
+        return -1;
+}
+
 VALUE fuzzy_jaro_winkler_distance(VALUE self, VALUE s1, VALUE s2) {
     return DBL2NUM(c_jaro_winkler_distance(CSTRING(s1), CSTRING(s2)));
+}
+
+VALUE fuzzy_levenstein_distance(VALUE self, VALUE s1, VALUE s2) {
+    return INT2NUM(c_levenstein_distance(CSTRING(s1), CSTRING(s2)));
 }
 
 VALUE fuzzy_snowball(int argc, VALUE * argv, VALUE self) {
@@ -151,11 +190,11 @@ VALUE fuzzy_soundex(VALUE self, VALUE string) {
 
     static int code[] = { 0, 1, 2, 3, 0, 1, 2, 0, 0, 2, 2, 4, 5, 5, 0, 1, 2, 6, 2, 3, 0, 1, 0, 2, 0, 2 };
                        /* a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z */
-    static char   key[5];
+    static char key[5];
     register char ch;
-    register int  last;
-    register int  count;
-    const char    *cstring = RSTRING_PTR(string);
+    register int last;
+    register int count;
+    const char *cstring = RSTRING_PTR(string);
 
     /* Set up default key, complete with trailing '0's */
     strcpy(key, "Z000");
@@ -192,16 +231,17 @@ VALUE fuzzy_soundex(VALUE self, VALUE string) {
     return rb_str_new2(key);
 }
 
-void Init_fuzzy() {
-    mFuzzy = rb_define_module("Fuzzy");
+void Init_fuzzy_string() {
+    mFuzzy = rb_define_module("FuzzyString");
 
     fuzzy_default_language = rb_str_new2("en");
     rb_global_variable(&fuzzy_default_language);
 
     rb_define_module_function(mFuzzy, "jaro_winkler_distance", RUBY_METHOD_FUNC(fuzzy_jaro_winkler_distance), 2);
-    rb_define_module_function(mFuzzy, "stem",                  RUBY_METHOD_FUNC(fuzzy_snowball),             -1);
-    rb_define_module_function(mFuzzy, "stem_languages",        RUBY_METHOD_FUNC(fuzzy_snowball_languages),    0);
-    rb_define_module_function(mFuzzy, "soundex",               RUBY_METHOD_FUNC(fuzzy_soundex),               1);
+    rb_define_module_function(mFuzzy, "levenstein_distance", RUBY_METHOD_FUNC(fuzzy_levenstein_distance), 2);
+    rb_define_module_function(mFuzzy, "stem", RUBY_METHOD_FUNC(fuzzy_snowball), -1);
+    rb_define_module_function(mFuzzy, "stem_languages", RUBY_METHOD_FUNC(fuzzy_snowball_languages), 0);
+    rb_define_module_function(mFuzzy, "soundex", RUBY_METHOD_FUNC(fuzzy_soundex), 1);
 
     rb_define_const(mFuzzy, "VERSION", rb_str_new2(RUBY_FUZZY_VERSION));
 }

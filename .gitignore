@@ -1,4 +1,4 @@
-ext/fuzzy/*
+ext/fuzzy-string/*
 !ext/**/extconf.rb
 !ext/**/*.c
 !ext/**/*.h

@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{fuzzy}
+  s.name = %q{fuzzy-string}
   s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.date = %q{2012-02-15}
   s.description = %q{A collection of functions for fuzzy string matching.}
   s.email = ["deepfryed@gmail.com"]
-  s.extensions = ["ext/fuzzy/extconf.rb"]
-  s.files = ["ext/fuzzy/fuzzy.c", "ext/fuzzy/version.h", "ext/fuzzy/extconf.rb", "test/helper.rb", "test/test_fuzzy.rb", "lib/fuzzy.rb", "README.md", "CHANGELOG"]
-  s.homepage = %q{http://github.com/deepfryed/fuzzy}
+  s.extensions = ["ext/fuzzy-string/extconf.rb"]
+  s.files = ["ext/fuzzy-string/fuzzy-string.c", "ext/fuzzy-string/version.h", "ext/fuzzy-string/extconf.rb", "test/helper.rb", "test/test_fuzzy.rb", "lib/fuzzy-string.rb", "README.md", "CHANGELOG"]
+  s.homepage = %q{http://github.com/deepfryed/fuzzy-string}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{Fuzzy string matching}
