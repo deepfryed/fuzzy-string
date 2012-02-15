@@ -1,0 +1,1 @@
+#define RUBY_FUZZY_VERSION "0.1.0"

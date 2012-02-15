@@ -1,0 +1,7 @@
+ext/fuzzy/*
+!ext/**/extconf.rb
+!ext/**/*.c
+!ext/**/*.h
+pkg/
+tmp/
+*.gem
