@@ -1,4 +1,4 @@
-# Fuzzy
+# Fuzzy String
 
 A compilation of functions that allow fuzzy string matching.
 

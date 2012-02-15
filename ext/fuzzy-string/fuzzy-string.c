@@ -1,5 +1,5 @@
 /*
-    (c) Bharanee Rathna 2011
+    (c) Bharanee Rathna 2012
 
     CC BY-SA 3.0
     http://creativecommons.org/licenses/by-sa/3.0/
@@ -108,6 +108,7 @@ double c_jaro_winkler_distance(char *s1, char *s2) {
     return jw;
 }
 
+// http://www.merriampark.com/ldc.htm
 int c_levenstein_distance(char *s, char *t) {
     int k, i, j, n, m, cost, *d, distance;
     n = strlen(s);
